@@ -1,0 +1,228 @@
+You are an expert full-stack product engineer. Build an MVP web application called “Market Intelligence AI”.
+
+Goal:
+Create an AI-powered market intelligence platform that reads financial news and market data from trusted open/public sources, groups related information into market themes, and generates easy-to-understand insights. This is NOT a stock recommendation app. It should not say “buy/sell”. It should provide market understanding, risk signals, sector narratives, and source-backed summaries.
+
+Important positioning:
+- Do not build an investment advisor.
+- Do not give direct financial advice.
+- Use wording like: “market intelligence”, “risk indicator”, “possible impact”, “watchlist”, “sentiment”, “narrative”.
+- Always show sources behind AI-generated insights.
+
+Tech stack:
+Frontend:
+- Next.js
+- Tailwind CSS
+- TypeScript
+
+Backend:
+- FastAPI
+- Python 3
+
+Database:
+- PostgreSQL
+
+AI:
+- OpenAI API or compatible LLM provider
+- Keep API key in environment variable
+
+Hosting-ready:
+- Use Docker where useful
+- Provide clear setup instructions
+
+Core MVP features:
+
+1. User Dashboard
+Create a clean dashboard with these sections:
+- Today’s Market Themes
+- Top Risk Signals
+- Asset Watch
+- Sector Narratives
+- Latest Source Articles
+
+2. News/Data Ingestion
+Create backend ingestion modules that can fetch from configurable RSS/news/public URLs.
+Initial sources can be placeholders/config based:
+- Moneycontrol
+- Economic Times Markets
+- Livemint Markets
+- RBI updates
+- SEBI updates
+- Yahoo Finance RSS or public finance feeds
+- Investing.com RSS if available
+
+Store each article with:
+- title
+- source
+- url
+- published_at
+- summary/raw text if available
+- asset tags
+- sector tags
+- macro tags
+- created_at
+
+3. AI Theme Extraction
+Create a scheduled/manual pipeline:
+- Fetch latest articles
+- Remove duplicates
+- Cluster similar stories
+- Ask LLM to identify market themes
+- Generate structured output
+
+Each market theme should include:
+- theme_title
+- short_summary
+- why_it_matters
+- affected_assets
+- affected_sectors
+- sentiment: bullish / bearish / neutral / mixed
+- confidence_score from 0 to 100
+- risk_level: low / medium / high
+- supporting_sources
+- generated_at
+
+4. Important Disclaimer
+Add disclaimer in UI:
+“This platform provides market intelligence and educational insights only. It does not provide investment advice, buy/sell recommendations, or guaranteed predictions.”
+
+5. Asset Categories
+Initially support:
+- Indian equity market
+- Gold
+- Real estate
+- Crude oil
+- USD/INR
+- Bitcoin
+- Global markets
+
+6. Pages Required
+Build these pages:
+
+/dashboard
+Main dashboard with latest intelligence.
+
+/themes
+List all generated market themes.
+
+/themes/[id]
+Detailed page for one theme with source links.
+
+
+/assets
+Asset category overview.
+
+/assets/[asset]
+Shows themes and articles related to that asset.
+
+/sources
+Shows latest ingested source articles.
+
+/admin
+Simple admin page to manually trigger:
+- fetch news
+- generate themes
+- clear old test data
+
+7. Backend API Endpoints
+Create APIs:
+
+GET /api/articles
+GET /api/themes
+GET /api/themes/{id}
+GET /api/assets
+GET /api/assets/{asset}
+POST /api/admin/fetch-news
+POST /api/admin/generate-themes
+
+8. Database Tables
+Create SQLAlchemy models:
+
+Article:
+- id
+- title
+- source
+- url
+- published_at
+- raw_text
+- summary
+- asset_tags
+- sector_tags
+- macro_tags
+- content_hash
+- created_at
+
+MarketTheme:
+- id
+- theme_title
+- short_summary
+- why_it_matters
+- affected_assets
+- affected_sectors
+- sentiment
+- confidence_score
+- risk_level
+- supporting_article_ids
+- generated_at
+
+9. LLM Prompting
+Create a dedicated prompt file for theme generation.
+
+The LLM should return strict JSON:
+{
+  "themes": [
+    {
+      "theme_title": "...",
+      "short_summary": "...",
+      "why_it_matters": "...",
+      "affected_assets": ["..."],
+      "affected_sectors": ["..."],
+      "sentiment": "bullish/bearish/neutral/mixed",
+      "confidence_score": 0-100,
+      "risk_level": "low/medium/high",
+      "supporting_article_ids": [1,2,3]
+    }
+  ]
+}
+
+10. UI Style
+Make UI clean, modern, and professional:
+- dark/light friendly design
+- cards
+- tags
+- confidence badges
+- sentiment badges
+- source links
+- responsive layout
+
+11. Avoid These
+Do not build:
+- broker integration
+- buy/sell recommendation
+- stock prediction engine
+- portfolio management
+- paid subscription yet
+- mobile app
+- complex authentication in MVP
+
+12. Deliverables
+Provide:
+- complete working code
+- folder structure
+- .env.example
+- database migration or table creation script
+- README with setup steps
+- sample seed data
+- instructions to run frontend and backend locally
+
+13. MVP Priority
+First make the complete flow work:
+Fetch articles → store articles → generate AI themes → show themes on dashboard.
+
+After that, improve UI.
+Do not over-engineer.
+Build clean, working MVP first.
+
+I have deepseek API key that we can use for this. 
+I have render account for making webbase UI 
+i have neon for storage
