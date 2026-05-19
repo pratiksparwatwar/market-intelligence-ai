@@ -1,0 +1,21 @@
+body { background: #f0f2f5; }
+
+.theme-card { border-left: 5px solid #6c757d; transition: transform .15s; }
+.theme-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+.theme-card.bullish  { border-left-color: #198754; }
+.theme-card.bearish  { border-left-color: #dc3545; }
+.theme-card.neutral  { border-left-color: #6c757d; }
+.theme-card.mixed    { border-left-color: #fd7e14; }
+
+.badge-bullish  { background-color: #198754; }
+.badge-bearish  { background-color: #dc3545; }
+.badge-neutral  { background-color: #6c757d; }
+.badge-mixed    { background-color: #fd7e14; }
+
+.risk-low    { color: #198754; }
+.risk-medium { color: #fd7e14; }
+.risk-high   { color: #dc3545; }
+
+.confidence-bar { height: 6px; border-radius: 3px; }
+.source-badge { font-size: .7rem; }
+.article-row:hover { background: #f8f9fa; }

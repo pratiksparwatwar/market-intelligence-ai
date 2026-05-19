@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}{{ theme.theme_title }} — Market Intelligence AI{% endblock %}
+{% block nav_themes %}active{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <a href="{% url 'theme_list' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>All Themes
+  </a>
+</div>
+
+<div class="card theme-card {{ theme.sentiment }} mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start mb-3">
+      <span class="badge badge-{{ theme.sentiment }} text-white fs-6 mb-2">
+        {{ theme.get_sentiment_display }}
+      </span>
+      <div class="d-flex gap-3">
+        <span class="risk-{{ theme.risk_level }} fw-semibold">
+          <i class="bi bi-shield me-1"></i>{{ theme.risk_level|capfirst }} Risk
+        </span>
+        <span class="text-muted small">Confidence: {{ theme.confidence_pct }}%</span>
+      </div>
+    </div>
+
+    <h4 class="fw-bold mb-3">{{ theme.theme_title }}</h4>
+
+    <div class="row g-4">
+      <div class="col-md-7">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2">Market Intelligence Summary</h6>
+        <p>{{ theme.short_summary }}</p>
+
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2 mt-4">Why Market Participants Are Watching</h6>
+        <p>{{ theme.why_it_matters }}</p>
+      </div>
+      <div class="col-md-5">
+        {% if theme.affected_assets %}
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2">Assets / Indices on Watchlist</h6>
+        <div class="mb-3">
+          {% for asset in theme.affected_assets %}
+          <span class="badge bg-dark me-1 mb-1">{{ asset }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if theme.affected_sectors %}
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2">Sector Narrative</h6>
+        <div class="mb-3">
+          {% for sector in theme.affected_sectors %}
+          <span class="badge bg-secondary me-1 mb-1">{{ sector }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="mt-3">
+          <div class="d-flex justify-content-between small mb-1">
+            <span class="text-muted">Confidence Score</span>
+            <span>{{ theme.confidence_pct }}%</span>
+          </div>
+          <div class="progress confidence-bar">
+            <div class="progress-bar
+              {% if theme.sentiment == 'bullish' %}bg-success
+              {% elif theme.sentiment == 'bearish' %}bg-danger
+              {% elif theme.sentiment == 'mixed' %}bg-warning
+              {% else %}bg-secondary{% endif %}"
+              style="width:{{ theme.confidence_pct }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Source Articles -->
+<h5 class="fw-semibold mb-3">
+  <i class="bi bi-link-45deg me-2"></i>Source Articles
+  <span class="badge bg-secondary ms-2">{{ theme.supporting_articles.count }}</span>
+</h5>
+{% if theme.supporting_articles.exists %}
+<div class="card">
+  <ul class="list-group list-group-flush">
+    {% for article in theme.supporting_articles.all %}
+    <li class="list-group-item article-row">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <a href="{{ article.url }}" target="_blank" rel="noopener"
+             class="text-decoration-none text-dark fw-semibold">
+            <i class="bi bi-box-arrow-up-right me-1 text-muted small"></i>{{ article.title }}
+          </a>
+          <div class="mt-1">
+            <span class="badge bg-light text-dark border source-badge">{{ article.source }}</span>
+            {% for tag in article.asset_tags %}
+            <span class="badge bg-info bg-opacity-10 text-info border border-info source-badge ms-1">{{ tag }}</span>
+            {% endfor %}
+            {% for tag in article.sector_tags %}
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border source-badge ms-1">{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% if article.published_at %}
+        <small class="text-muted ms-3 text-nowrap">{{ article.published_at|date:"d M, H:i" }}</small>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<p class="text-muted">No source articles linked to this theme.</p>
+{% endif %}
+{% endblock %}

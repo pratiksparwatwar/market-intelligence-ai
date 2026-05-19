@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}News Feed — Market Intelligence AI{% endblock %}
+{% block nav_news %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-newspaper me-2 text-info"></i>News Feed</h4>
+  <span class="badge bg-secondary fs-6">{{ articles|length }} articles</span>
+</div>
+
+<!-- Source Filter -->
+{% if sources %}
+<div class="mb-4 d-flex flex-wrap gap-2">
+  <a href="{% url 'articles_list' %}"
+     class="btn btn-sm {% if not source_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}">All</a>
+  {% for src in sources %}
+  <a href="{% url 'articles_list' %}?source={{ src }}"
+     class="btn btn-sm {% if source_filter == src %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+    {{ src }}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not articles %}
+<div class="alert alert-info">
+  No articles found. Go to <a href="{% url 'admin_panel' %}">Admin Panel</a> and fetch news first.
+</div>
+{% else %}
+<div class="card">
+  <ul class="list-group list-group-flush">
+    {% for article in articles %}
+    <li class="list-group-item article-row py-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="flex-grow-1">
+          <a href="{{ article.url }}" target="_blank" rel="noopener"
+             class="text-decoration-none text-dark fw-semibold">
+            <i class="bi bi-box-arrow-up-right me-1 text-muted" style="font-size:.8rem"></i>{{ article.title }}
+          </a>
+          {% if article.summary %}
+          <p class="small text-muted mt-1 mb-1">{{ article.summary|truncatewords:20 }}</p>
+          {% endif %}
+          <div class="mt-1">
+            <span class="badge bg-light text-dark border source-badge">{{ article.source }}</span>
+            {% for tag in article.asset_tags %}
+            <span class="badge bg-info bg-opacity-10 text-info border border-info source-badge ms-1">{{ tag }}</span>
+            {% endfor %}
+            {% for tag in article.sector_tags %}
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border source-badge ms-1">{{ tag }}</span>
+            {% endfor %}
+            {% for tag in article.macro_tags %}
+            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning source-badge ms-1">{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% if article.published_at %}
+        <small class="text-muted ms-3 text-nowrap">{{ article.published_at|date:"d M, H:i" }}</small>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

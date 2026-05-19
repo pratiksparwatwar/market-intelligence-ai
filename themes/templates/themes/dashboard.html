@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Market Intelligence AI{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2 text-info"></i>Market Dashboard</h4>
+  <div class="d-flex gap-2">
+    <span class="badge bg-secondary fs-6">{{ total_articles }} articles</span>
+    <span class="badge bg-dark fs-6">{{ total_themes }} themes</span>
+  </div>
+</div>
+
+{% if not themes %}
+<div class="alert alert-info">
+  <i class="bi bi-info-circle me-2"></i>No themes yet.
+  Go to <a href="{% url 'admin_panel' %}">Admin Panel</a> → Fetch News → Generate Themes.
+</div>
+{% else %}
+
+<!-- Market Themes -->
+<h5 class="fw-semibold mb-3"><i class="bi bi-layers me-2"></i>Market Themes</h5>
+<div class="row g-3 mb-5">
+  {% for theme in themes %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 theme-card {{ theme.sentiment }}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="badge badge-{{ theme.sentiment }} text-white">
+            {% if theme.sentiment == 'bullish' %}<i class="bi bi-arrow-up-circle me-1"></i>{% endif %}
+            {% if theme.sentiment == 'bearish' %}<i class="bi bi-arrow-down-circle me-1"></i>{% endif %}
+            {% if theme.sentiment == 'neutral' %}<i class="bi bi-dash-circle me-1"></i>{% endif %}
+            {% if theme.sentiment == 'mixed' %}<i class="bi bi-arrows-vertical me-1"></i>{% endif %}
+            {{ theme.get_sentiment_display }}
+          </span>
+          <span class="small risk-{{ theme.risk_level }} fw-semibold">
+            <i class="bi bi-shield-{% if theme.risk_level == 'low' %}check{% elif theme.risk_level == 'medium' %}exclamation{% else %}x{% endif %} me-1"></i>
+            {{ theme.risk_level|capfirst }} Risk
+          </span>
+        </div>
+        <h6 class="card-title fw-bold">{{ theme.theme_title }}</h6>
+        <p class="card-text small text-muted">{{ theme.short_summary|truncatewords:25 }}</p>
+
+        <!-- Confidence -->
+        <div class="mb-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span class="text-muted">Confidence</span>
+            <span>{{ theme.confidence_pct }}%</span>
+          </div>
+          <div class="progress confidence-bar">
+            <div class="progress-bar
+              {% if theme.sentiment == 'bullish' %}bg-success
+              {% elif theme.sentiment == 'bearish' %}bg-danger
+              {% elif theme.sentiment == 'mixed' %}bg-warning
+              {% else %}bg-secondary{% endif %}"
+              style="width:{{ theme.confidence_pct }}%"></div>
+          </div>
+        </div>
+
+        {% if theme.affected_assets %}
+        <div class="mb-1">
+          {% for asset in theme.affected_assets %}
+          <span class="badge bg-light text-dark border me-1 mb-1 small">{{ asset }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <a href="{% url 'theme_detail' theme.pk %}" class="btn btn-sm btn-outline-secondary mt-2">
+          View Sources <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Asset Watch -->
+{% if asset_watch %}
+<h5 class="fw-semibold mb-3"><i class="bi bi-eye me-2"></i>Asset Watch</h5>
+<div class="card mb-5">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>Asset / Index</th>
+          <th>Themes Mentioning</th>
+          <th>Sentiment Mix</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for asset, data in asset_watch.items %}
+        <tr class="article-row">
+          <td class="fw-semibold">{{ asset }}</td>
+          <td><span class="badge bg-secondary">{{ data.theme_count }}</span></td>
+          <td>
+            {% for s in data.sentiments %}
+            <span class="badge badge-{{ s }} text-white me-1">{{ s }}</span>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent News -->
+<h5 class="fw-semibold mb-3"><i class="bi bi-newspaper me-2"></i>Recent News</h5>
+<div class="card">
+  <ul class="list-group list-group-flush">
+    {% for article in recent_articles %}
+    <li class="list-group-item article-row">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <a href="{{ article.url }}" target="_blank" rel="noopener"
+             class="text-decoration-none text-dark fw-semibold small">
+            {{ article.title }}
+          </a>
+          <div class="mt-1">
+            <span class="badge bg-light text-dark border source-badge">{{ article.source }}</span>
+            {% for tag in article.asset_tags %}
+            <span class="badge bg-info bg-opacity-10 text-info border border-info source-badge">{{ tag }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <small class="text-muted ms-3 text-nowrap">
+          {% if article.published_at %}{{ article.published_at|date:"d M" }}{% endif %}
+        </small>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+<div class="text-end mt-2">
+  <a href="{% url 'articles_list' %}" class="small text-muted">View all news &rarr;</a>
+</div>
+
+{% endif %}
+{% endblock %}

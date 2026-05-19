@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel — Market Intelligence AI{% endblock %}
+{% block nav_admin %}active{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-1"><i class="bi bi-tools me-2 text-info"></i>Admin Panel</h4>
+<p class="text-muted mb-4">Fetch news from RSS feeds and generate AI market themes.</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-center p-2">
+      <div class="card-body">
+        <i class="bi bi-newspaper display-4 text-info mb-2"></i>
+        <h6 class="text-muted">Articles in DB</h6>
+        <h2 class="fw-bold" id="article-count">{{ article_count }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-2">
+      <div class="card-body">
+        <i class="bi bi-layers display-4 text-success mb-2"></i>
+        <h6 class="text-muted">Themes Generated</h6>
+        <h2 class="fw-bold" id="theme-count">{{ theme_count }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center p-2">
+      <div class="card-body">
+        <i class="bi bi-robot display-4 text-warning mb-2"></i>
+        <h6 class="text-muted">AI Model</h6>
+        <h5 class="fw-bold">DeepSeek</h5>
+        <small class="text-muted">deepseek-chat</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Step 1: Fetch News -->
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h6 class="fw-bold"><span class="badge bg-dark me-2">1</span>Fetch News</h6>
+        <p class="small text-muted mt-2 mb-3">
+          Pulls latest articles from Moneycontrol, ET Markets, Livemint, Yahoo Finance, RBI, and Investing.com RSS feeds.
+        </p>
+        <button id="btn-fetch" class="btn btn-info w-100" onclick="triggerAction('{% url 'fetch_news' %}', 'btn-fetch', 'result-fetch', 'Fetch News')">
+          <i class="bi bi-cloud-download me-2"></i>Fetch News
+        </button>
+        <div id="result-fetch" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Generate Themes -->
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h6 class="fw-bold"><span class="badge bg-dark me-2">2</span>Generate Themes</h6>
+        <p class="small text-muted mt-2 mb-3">
+          Sends the latest 50 articles to DeepSeek AI, which clusters them into 3–7 market themes with sentiment and risk analysis.
+        </p>
+        <button id="btn-themes" class="btn btn-success w-100" onclick="triggerAction('{% url 'generate_themes' %}', 'btn-themes', 'result-themes', 'Generate Themes')">
+          <i class="bi bi-cpu me-2"></i>Generate Themes
+        </button>
+        <div id="result-themes" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Data -->
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h6 class="fw-bold text-danger"><i class="bi bi-trash me-2"></i>Clear All Data</h6>
+        <p class="small text-muted mt-2 mb-3">
+          Deletes all articles and themes from the database. Cannot be undone.
+        </p>
+        <button id="btn-clear" class="btn btn-outline-danger w-100"
+                onclick="if(confirm('Delete all articles and themes?')) triggerAction('{% url 'clear_data' %}', 'btn-clear', 'result-clear', 'Clear All Data')">
+          <i class="bi bi-trash me-2"></i>Clear All Data
+        </button>
+        <div id="result-clear" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4 text-end">
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-speedometer2 me-1"></i>View Dashboard
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const CSRF = '{{ csrf_token }}';
+
+async function triggerAction(url, btnId, resultId, label) {
+  const btn = document.getElementById(btnId);
+  const result = document.getElementById(resultId);
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
+  result.innerHTML = '';
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' }
+    });
+    const data = await resp.json();
+    if (data.status === 'success') {
+      result.innerHTML = `<div class="alert alert-success py-2 small">${data.message}</div>`;
+      // Refresh counts after action
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      result.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+    }
+  } catch (e) {
+    result.innerHTML = `<div class="alert alert-danger py-2 small">Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = label;
+}
+</script>
+{% endblock %}

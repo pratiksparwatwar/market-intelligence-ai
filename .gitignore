@@ -1,16 +1,21 @@
-# Environment files — never commit real keys
-backend/.env
-frontend/.env.local
+# Environment
+.env
+*.env
 
 # Python
-backend/venv/
-backend/__pycache__/
-backend/**/__pycache__/
-backend/**/*.pyc
+venv/
+__pycache__/
+**/__pycache__/
+**/*.pyc
 
-# Node
+# Django
+staticfiles/
+db.sqlite3
+
+# Node (old frontend)
 frontend/node_modules/
 frontend/.next/
+frontend/.env.local
 
 # Misc
 .DS_Store
