@@ -8,6 +8,10 @@ from .services import generate_themes
 from news.services import fetch_and_store_articles
 
 
+def ping(request):
+    return JsonResponse({'status': 'ok'})
+
+
 def dashboard(request):
     themes = MarketTheme.objects.prefetch_related('supporting_articles').all()[:6]
     recent_articles = Article.objects.order_by('-created_at')[:8]
@@ -81,3 +85,18 @@ def trigger_clear_data(request):
     MarketTheme.objects.all().delete()
     Article.objects.all().delete()
     return JsonResponse({'status': 'success', 'message': 'All data cleared'})
+
+
+@require_POST
+def trigger_refresh_all(request):
+    try:
+        article_count = fetch_and_store_articles()
+        theme_count = generate_themes()
+        return JsonResponse({
+            'status': 'success',
+            'articles_fetched': article_count,
+            'themes_generated': theme_count,
+            'message': f'Fetched {article_count} articles, generated {theme_count} themes',
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

@@ -9,4 +9,6 @@ urlpatterns = [
     path('api/fetch-news/', views.trigger_fetch_news, name='fetch_news'),
     path('api/generate-themes/', views.trigger_generate_themes, name='generate_themes'),
     path('api/clear-data/', views.trigger_clear_data, name='clear_data'),
+    path('api/refresh-all/', views.trigger_refresh_all, name='refresh_all'),
+    path('ping/', views.ping, name='ping'),
 ]
