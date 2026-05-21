@@ -53,6 +53,7 @@ Return ONLY the JSON array. No markdown, no explanation."""
     client = openai.OpenAI(
         api_key=settings.DEEPSEEK_API_KEY,
         base_url=settings.DEEPSEEK_BASE_URL,
+        timeout=90,
     )
 
     response = client.chat.completions.create(

@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from news.models import Article
@@ -60,6 +61,7 @@ def admin_panel(request):
     })
 
 
+@csrf_exempt
 @require_POST
 def trigger_fetch_news(request):
     try:
@@ -70,6 +72,7 @@ def trigger_fetch_news(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 @require_POST
 def trigger_generate_themes(request):
     try:
@@ -80,6 +83,7 @@ def trigger_generate_themes(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
+@csrf_exempt
 @require_POST
 def trigger_clear_data(request):
     MarketTheme.objects.all().delete()
@@ -87,6 +91,7 @@ def trigger_clear_data(request):
     return JsonResponse({'status': 'success', 'message': 'All data cleared'})
 
 
+@csrf_exempt
 @require_POST
 def trigger_refresh_all(request):
     try:
