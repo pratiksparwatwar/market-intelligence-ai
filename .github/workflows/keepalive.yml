@@ -1,0 +1,12 @@
+name: Market AI Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'   # every 14 minutes (GitHub minimum is 5 min)
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping app to prevent Render spin-down
+        run: curl -s "${{ secrets.APP_URL }}/ping/" --max-time 30

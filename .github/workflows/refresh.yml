@@ -1,0 +1,18 @@
+name: Market AI Refresh
+
+on:
+  schedule:
+    - cron: '0 4 * * 1-5'    # 9:30 AM IST (weekdays)
+    - cron: '0 10 * * 1-5'   # 3:30 PM IST (weekdays)
+  workflow_dispatch:          # allow manual trigger from GitHub UI
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch news and generate themes
+        run: |
+          curl -s -X POST "${{ secrets.APP_URL }}/api/refresh-all/" \
+            --max-time 150 \
+            --retry 2 \
+            --retry-delay 10
